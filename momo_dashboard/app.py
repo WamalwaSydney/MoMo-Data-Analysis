@@ -78,7 +78,12 @@ def index(): return render_template("index.html")
 
 @app.route("/api/summary")
 def summary():
-    df = pd.read_sql_query("SELECT transaction_type, COUNT(*) count, SUM(amount) total FROM transactions GROUP BY transaction_type", sqlite3.connect(DB))
+    conn = sqlite3.connect(DB)
+    df = pd.read_sql_query("""
+        SELECT transaction_type, COUNT(*) as count, COALESCE(SUM(amount), 0) as total
+        FROM transactions
+        GROUP BY transaction_type
+    """, conn)
     return jsonify(df.to_dict(orient="records"))
 
 @app.route("/api/transactions")
