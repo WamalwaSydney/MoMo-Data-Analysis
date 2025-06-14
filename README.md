@@ -4,7 +4,7 @@ An interactive fullstack web dashboard that analyzes and visualizes mobile money
 
 ---
 
-## 📁 Project Structure
+## Project Structure
 
 ```
 ├── app.py                    # Flask backend + XML processing
@@ -20,22 +20,22 @@ An interactive fullstack web dashboard that analyzes and visualizes mobile money
 
 ---
 
-## 🚀 Features
+## Features
 
-* 📊 Dynamic summary chart of transactions by type
-* 🔍 Filterable list of transaction details
-* 🧼 Auto-cleans and categorizes raw MoMo SMS
-* 💾 Saves structured data to SQLite
-* 🌐 Frontend styled with MoMo branding and Chart.js visualizations
+* Dynamic summary chart of transactions by type
+* Filterable list of transaction details
+* Auto-cleans and categorizes raw MoMo SMS
+* Saves structured data to SQLite
+* Frontend styled with MoMo branding and Chart.js visualizations
 
 ---
 
-## ⚙️ How to Run
+## How to Run
 
 ### 1. Clone the Repository
 
 ```bash
-git clone https://github.com/<your-username>/momo-data-analysis.git
+git clone https://github.com/wamalwasydney/momo-data-analysis.git
 cd momo-data-analysis
 ```
 
@@ -65,7 +65,7 @@ http://localhost:5000   (or sandbox port e.g. http://<sandbox-host>:35030)
 
 ---
 
-## 🧠 Architecture
+## Architecture
 
 * **Backend**: Flask for routing and data processing
 * **Database**: SQLite, auto-populated from parsed XML
@@ -74,7 +74,7 @@ http://localhost:5000   (or sandbox port e.g. http://<sandbox-host>:35030)
 
 ---
 
-## 📹 Video Walkthrough
+## Video Walkthrough
 
 🎥 [Watch Demo (5 min)](https://youtu.be/YOUR_VIDEO_LINK)
 
@@ -82,7 +82,7 @@ http://localhost:5000   (or sandbox port e.g. http://<sandbox-host>:35030)
 
 ---
 
-## 📄 Documentation
+## Documentation
 
 See `report.pdf` for a detailed write-up of:
 
@@ -93,6 +93,6 @@ See `report.pdf` for a detailed write-up of:
 
 ---
 
-## 👨🏽‍💻 AUTHORS
+## AUTHORS
 
 See the `AUTHORS` file for contributor details.
