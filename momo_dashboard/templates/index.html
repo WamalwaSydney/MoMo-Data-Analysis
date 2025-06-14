@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>MoMo Dashboard</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+  <h2>Transaction Summary</h2>
+  <canvas id="chart" width="400" height="200"></canvas>
+  <h3>Transaction Details</h3>
+  <select id="filter"></select>
+  <table border="1">
+    <thead><tr><th>Date</th><th>Type</th><th>Amount</th><th>Recipient</th></tr></thead>
+    <tbody id="table-body"></tbody>
+  </table>
+<script>
+fetch('/api/summary')
+  .then(r => r.json())
+  .then(data => {
+    const labels = data.map(d => d.transaction_type);
+    const values = data.map(d => d.total);
+    const filter = document.getElementById('filter');
+    data.forEach(d => {
+      const o = document.createElement('option');
+      o.value = d.transaction_type;
+      o.innerText = d.transaction_type;
+      filter.appendChild(o);
+    });
+    new Chart(document.getElementById('chart'), {
+      type: 'bar',
+      data: { labels, datasets: [{ label: 'Total Amount (RWF)', data: values }] },
+    });
+  });
+
+filter.onchange = () => {
+  fetch('/api/transactions?type=' + filter.value)
+    .then(r => r.json())
+    .then(data => {
+      const tbody = document.getElementById('table-body');
+      tbody.innerHTML = "";
+      data.forEach(row => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `<td>${row.date}</td><td>${row.transaction_type}</td><td>${row.amount}</td><td>${row.recipient}</td>`;
+        tbody.appendChild(tr);
+      });
+    });
+}
+</script>
+</body>
+</html>
