@@ -1,24 +1,91 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>MoMo Dashboard</title>
+  <title>MoMo Data Analysis</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: #fff6e5;
+      margin: 2rem;
+      color: #333;
+    }
+    h1 {
+      text-align: center;
+      color: #ffc107;
+      margin-bottom: 2rem;
+    }
+    section {
+      margin-bottom: 3rem;
+      background-color: #fff;
+      padding: 2rem;
+      border-radius: 8px;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+    }
+    h2, h3 {
+      color: #212529;
+      margin-bottom: 1rem;
+    }
+    canvas {
+      background: white;
+      border-radius: 8px;
+      padding: 1rem;
+    }
+    select {
+      padding: 0.5rem;
+      font-size: 1rem;
+      border: 1px solid #ffc107;
+      border-radius: 6px;
+      margin-bottom: 1rem;
+      background-color: #fff9db;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background: white;
+      border-radius: 6px;
+      overflow: hidden;
+    }
+    th, td {
+      padding: 0.75rem 1rem;
+      border-bottom: 1px solid #f0e68c;
+      text-align: left;
+    }
+    th {
+      background-color: #fff3cd;
+      font-weight: 600;
+    }
+    tr:hover {
+      background-color: #fff8e1;
+    }
+  </style>
 </head>
 <body>
-  <h2>Transaction Summary</h2>
-  <canvas id="chart" width="400" height="200"></canvas>
-  <h3>Transaction Details</h3>
-  <select id="filter"></select>
-  <table border="1">
-    <thead><tr><th>Date</th><th>Type</th><th>Amount</th><th>Recipient</th></tr></thead>
-    <tbody id="table-body"></tbody>
-  </table>
+  <h1> MoMo Data Analysis</h1>
+
+  <section>
+    <h2> Transaction Summary</h2>
+    <canvas id="chart" width="600" height="300"></canvas>
+  </section>
+
+  <section>
+    <h2> Transaction Details</h2>
+    <select id="filter">
+      <option value="">-- Select Transaction Type --</option>
+    </select>
+    <table>
+      <thead><tr><th>Date</th><th>Type</th><th>Amount (RWF)</th><th>Recipient</th></tr></thead>
+      <tbody id="table-body"></tbody>
+    </table>
+  </section>
+
 <script>
 fetch('/api/summary')
   .then(r => r.json())
   .then(data => {
     const labels = data.map(d => d.transaction_type);
-    const values = data.map(d => d.total);
+    const values = data.map(d => d.total || 0);
     const filter = document.getElementById('filter');
     data.forEach(d => {
       const o = document.createElement('option');
@@ -28,7 +95,24 @@ fetch('/api/summary')
     });
     new Chart(document.getElementById('chart'), {
       type: 'bar',
-      data: { labels, datasets: [{ label: 'Total Amount (RWF)', data: values }] },
+      data: {
+        labels,
+        datasets: [{
+          label: 'Total Amount (RWF)',
+          data: values,
+          backgroundColor: '#ffc107'
+        }]
+      },
+      options: {
+        responsive: true,
+        plugins: {
+          legend: { display: false },
+          tooltip: { callbacks: { label: ctx => `RWF ${ctx.parsed.y.toLocaleString()}` } }
+        },
+        scales: {
+          y: { beginAtZero: true, ticks: { callback: v => `RWF ${v.toLocaleString()}` } }
+        }
+      }
     });
   });
 
@@ -40,7 +124,7 @@ filter.onchange = () => {
       tbody.innerHTML = "";
       data.forEach(row => {
         const tr = document.createElement('tr');
-        tr.innerHTML = `<td>${row.date}</td><td>${row.transaction_type}</td><td>${row.amount}</td><td>${row.recipient}</td>`;
+        tr.innerHTML = `<td>${row.date}</td><td>${row.transaction_type}</td><td>${row.amount?.toLocaleString() || ''}</td><td>${row.recipient || ''}</td>`;
         tbody.appendChild(tr);
       });
     });
