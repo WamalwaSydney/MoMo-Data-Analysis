@@ -11,11 +11,24 @@
       margin: 2rem;
       color: #333;
     }
-    h1 {
-      text-align: center;
-      color: #ffc107;
+
+    .header {
+      display: flex;
+      align-items: center;
+      justify-content: center;
       margin-bottom: 2rem;
     }
+
+    .header img {
+      height: 50px;
+      margin-right: 1rem;
+    }
+
+    .header h1 {
+      color: #ffc107;
+      margin: 0;
+    }
+
     section {
       margin-bottom: 3rem;
       background-color: #fff;
@@ -23,15 +36,18 @@
       border-radius: 8px;
       box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
     }
+
     h2, h3 {
       color: #212529;
       margin-bottom: 1rem;
     }
+
     canvas {
       background: white;
       border-radius: 8px;
       padding: 1rem;
     }
+
     select {
       padding: 0.5rem;
       font-size: 1rem;
@@ -40,6 +56,7 @@
       margin-bottom: 1rem;
       background-color: #fff9db;
     }
+
     table {
       width: 100%;
       border-collapse: collapse;
@@ -47,30 +64,37 @@
       border-radius: 6px;
       overflow: hidden;
     }
+
     th, td {
       padding: 0.75rem 1rem;
       border-bottom: 1px solid #f0e68c;
       text-align: left;
     }
+
     th {
       background-color: #fff3cd;
       font-weight: 600;
     }
+
     tr:hover {
       background-color: #fff8e1;
     }
   </style>
 </head>
 <body>
-  <h1> MoMo Data Analysis</h1>
+
+  <div class="header">
+    <img src="static/mtn-momo.png" alt="logo">
+    <h1>MoMo Data Analysis</h1>
+  </div>
 
   <section>
-    <h2> Transaction Summary</h2>
+    <h2>Transaction Summary</h2>
     <canvas id="chart" width="600" height="300"></canvas>
   </section>
 
   <section>
-    <h2> Transaction Details</h2>
+    <h2>Transaction Details</h2>
     <select id="filter">
       <option value="">-- Select Transaction Type --</option>
     </select>
@@ -80,55 +104,56 @@
     </table>
   </section>
 
-<script>
-fetch('/api/summary')
-  .then(r => r.json())
-  .then(data => {
-    const labels = data.map(d => d.transaction_type);
-    const values = data.map(d => d.total || 0);
-    const filter = document.getElementById('filter');
-    data.forEach(d => {
-      const o = document.createElement('option');
-      o.value = d.transaction_type;
-      o.innerText = d.transaction_type;
-      filter.appendChild(o);
-    });
-    new Chart(document.getElementById('chart'), {
-      type: 'bar',
-      data: {
-        labels,
-        datasets: [{
-          label: 'Total Amount (RWF)',
-          data: values,
-          backgroundColor: '#ffc107'
-        }]
-      },
-      options: {
-        responsive: true,
-        plugins: {
-          legend: { display: false },
-          tooltip: { callbacks: { label: ctx => `RWF ${ctx.parsed.y.toLocaleString()}` } }
-        },
-        scales: {
-          y: { beginAtZero: true, ticks: { callback: v => `RWF ${v.toLocaleString()}` } }
-        }
-      }
-    });
-  });
-
-filter.onchange = () => {
-  fetch('/api/transactions?type=' + filter.value)
-    .then(r => r.json())
-    .then(data => {
-      const tbody = document.getElementById('table-body');
-      tbody.innerHTML = "";
-      data.forEach(row => {
-        const tr = document.createElement('tr');
-        tr.innerHTML = `<td>${row.date}</td><td>${row.transaction_type}</td><td>${row.amount?.toLocaleString() || ''}</td><td>${row.recipient || ''}</td>`;
-        tbody.appendChild(tr);
+  <script>
+    fetch('/api/summary')
+      .then(r => r.json())
+      .then(data => {
+        const labels = data.map(d => d.transaction_type);
+        const values = data.map(d => d.total || 0);
+        const filter = document.getElementById('filter');
+        data.forEach(d => {
+          const o = document.createElement('option');
+          o.value = d.transaction_type;
+          o.innerText = d.transaction_type;
+          filter.appendChild(o);
+        });
+        new Chart(document.getElementById('chart'), {
+          type: 'bar',
+          data: {
+            labels,
+            datasets: [{
+              label: 'Total Amount (RWF)',
+              data: values,
+              backgroundColor: '#ffc107'
+            }]
+          },
+          options: {
+            responsive: true,
+            plugins: {
+              legend: { display: false },
+              tooltip: { callbacks: { label: ctx => `RWF ${ctx.parsed.y.toLocaleString()}` } }
+            },
+            scales: {
+              y: { beginAtZero: true, ticks: { callback: v => `RWF ${v.toLocaleString()}` } }
+            }
+          }
+        });
       });
-    });
-}
-</script>
+
+    const filter = document.getElementById('filter');
+    filter.onchange = () => {
+      fetch('/api/transactions?type=' + filter.value)
+        .then(r => r.json())
+        .then(data => {
+          const tbody = document.getElementById('table-body');
+          tbody.innerHTML = "";
+          data.forEach(row => {
+            const tr = document.createElement('tr');
+            tr.innerHTML = `<td>${row.date}</td><td>${row.transaction_type}</td><td>${row.amount?.toLocaleString() || ''}</td><td>${row.recipient || ''}</td>`;
+            tbody.appendChild(tr);
+          });
+        });
+    };
+  </script>
 </body>
 </html>
