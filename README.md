@@ -76,7 +76,7 @@ http://localhost:5000   (or sandbox port e.g. http://<sandbox-host>:35030)
 
 ## Video Walkthrough
 
-🎥 [Watch Demo (5 min)]([https://youtu.be/YOUR_VIDEO_LINK](https://youtu.be/PDU2pZnkqnE))
+[Watch Demo (5 min)]([https://youtu.be/YOUR_VIDEO_LINK](https://youtu.be/PDU2pZnkqnE))
 
 > Covers system overview, architecture, database, and UI demo
 
