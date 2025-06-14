@@ -183,4 +183,4 @@ if __name__ == "__main__":
     if not os.path.exists(DB):
         df = parse_xml_to_df("modified_sms_v2.xml")
         init_db(df)
-    app.run(debug=True)
+    app.run(host="0.0.0.0", port=5000, debug=True)
