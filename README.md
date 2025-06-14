@@ -7,15 +7,15 @@ An interactive fullstack web dashboard that analyzes and visualizes mobile money
 ## Project Structure
 
 ```
-├── app.py                    # Flask backend + XML processing
-├── modified_sms_v2.xml       # Source SMS data (you provide this)
-├── momo_transactions.db      # SQLite DB (auto-generated)
-├── requirements.txt          # Python dependencies
+├── app.py                    
+├── modified_sms_v2.xml       
+├── momo_transactions.db      
+├── requirements.txt          
 ├── templates/
-│   └── index.html            # Dashboard UI
-├── README.md                 # This documentation
-├── AUTHORS                   # Contributor info
-├── report.pdf                # Project write-up
+│   └── index.html            
+├── README.md                 
+├── AUTHORS                   
+├── report.pdf                
 ```
 
 ---
