@@ -93,45 +93,39 @@ def summary():
 @app.route("/api/transactions")
 def transactions():
     tx_type = request.args.get("type")
-    print(f"DEBUG: Received filter request for type: '{tx_type}'")
+    search_query = request.args.get("search", "").strip()
+    print(f"DEBUG: Received filter request for type: '{tx_type}', search: '{search_query}'")
 
     try:
         conn = sqlite3.connect(DB)
 
+        # Build the query with both filtering and searching
+        query = "SELECT * FROM transactions WHERE 1=1"
+        params = []
+
+        # Add type filter if provided
         if tx_type:
-            # First, let's see what exact transaction types we have in the database
-            debug_df = pd.read_sql_query("SELECT DISTINCT transaction_type FROM transactions", conn)
-            print("DEBUG: Available transaction types in database:")
-            for _, row in debug_df.iterrows():
-                print(f"  - '{row['transaction_type']}'")
+            query += " AND transaction_type = ?"
+            params.append(tx_type)
+            print(f"DEBUG: Added type filter for: '{tx_type}'")
 
-            # Try exact match first
-            query = "SELECT * FROM transactions WHERE transaction_type = ?"
-            df = pd.read_sql_query(query, conn, params=(tx_type,))
-            print(f"DEBUG: Exact match found {len(df)} rows")
+        # Add search filter if provided
+        if search_query:
+            query += " AND (LOWER(recipient) LIKE ? OR LOWER(date) LIKE ?)"
+            search_param = f"%{search_query.lower()}%"
+            params.extend([search_param, search_param])
+            print(f"DEBUG: Added search filter for: '{search_query}'")
 
-            # If no exact match, try case-insensitive
-            if len(df) == 0:
-                query = "SELECT * FROM transactions WHERE LOWER(transaction_type) = LOWER(?)"
-                df = pd.read_sql_query(query, conn, params=(tx_type,))
-                print(f"DEBUG: Case-insensitive match found {len(df)} rows")
+        print(f"DEBUG: Final query: {query}")
+        print(f"DEBUG: Query params: {params}")
 
-            # If still no match, try partial match
-            if len(df) == 0:
-                query = "SELECT * FROM transactions WHERE transaction_type LIKE ?"
-                df = pd.read_sql_query(query, conn, params=(f"%{tx_type}%",))
-                print(f"DEBUG: Partial match found {len(df)} rows")
-
-        else:
-            df = pd.read_sql_query("SELECT * FROM transactions", conn)
-            print(f"DEBUG: No filter, returning all {len(df)} rows")
-
+        df = pd.read_sql_query(query, conn, params=params)
         conn.close()
+
+        print(f"DEBUG: Query returned {len(df)} rows")
 
         # CRITICAL FIX: Handle NaN values before converting to JSON
         df = df.fillna('')  # Replace NaN/None values with empty strings
-        # Or alternatively, you could use:
-        # df = df.where(pd.notnull(df), None)  # Replace NaN with None, then handle in to_dict
 
         result = df.to_dict(orient="records")
 
@@ -183,4 +177,4 @@ if __name__ == "__main__":
     if not os.path.exists(DB):
         df = parse_xml_to_df("modified_sms_v2.xml")
         init_db(df)
-    app.run(host="0.0.0.0", port=5000, debug=True)
+    app.run(debug=True)
